@@ -1,2 +1,9 @@
-# Back-Me-Up
-An automated backup system enabling one-click backup and restore of your drives
+# A app Flet app
+
+An example of a minimal Flet app.
+
+To run the app:
+
+```
+flet run [app_directory]
+```
