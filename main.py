@@ -1,7 +1,6 @@
 import flet as ft
 import os
 import backup
-import threading
 
 p = ft.Page
 
@@ -27,7 +26,6 @@ class ChckBox(ft.UserControl):
                            on_change=ChckBox.change,
                            data=self.drive)
     
-# D2 = ''
 class RadBut(ft.UserControl):
 
     def __init__(self, drives:list):
@@ -103,8 +101,13 @@ def run(e):
         return None
 
     p.close(filePrompt)
+
+    submit.disabled = True
+    submit.bgcolor = '#10595959'
+    submitText.color = '#949494'
+
     progContainer.visible = True
-    progContainer.update()
+    p.update()
 
     b = backup.Backup(D1, destinationDrives.D2)
     b.analyze(file)
@@ -119,14 +122,20 @@ def start(e):
         on_submit=run
     )
 
+    global filePrompt
     filePrompt = ft.AlertDialog(open=True, modal=True,
                         title=ft.Text(value='Backup Name'),
                         content=fileNameField,
-                        actions=[ft.Column(controls=[
+                        actions=[ft.Row(controls=[
+                            ft.TextButton(text='Close',
+                                          style=ft.ButtonStyle(color='Red'),
+                                          on_click=lambda _:p.close(filePrompt)),
                             ft.ElevatedButton(
                                 text='Begin Backup',
                                 on_click=run)
-                        ])],
+                            ],
+                            alignment=ft.MainAxisAlignment.SPACE_AROUND
+                        )],
                         shadow_color=ft.colors.BLACK)
     p.open(filePrompt)
 
@@ -165,27 +174,18 @@ backupHead2 = ft.Text(value='Backup Location',
                      font_family=1, 
                      size=15,
                      color='#1971C2')
-# backupScanButton = ft.IconButton(icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
-#                                  icon_color='#00ffff',
-#                                  on_click=scan)
-# backupHead2Container = ft.Row(controls=[backupHead2, backupScanButton])
-
-# d = os.listdrives()
-# drives = {i+1: ChckBox(d[i]) for i in range(0, len(d))}
 
 def pick_files2(e:ft.FilePickerResultEvent):
     global backupFile
     backupFile = (e.files)[0].path
     filePicker.text = os.path.split(backupFile)[-1]
     filePicker.update()
-# sourceDrives2 = ft.Column(controls=list(drives.values()))
 
 filePickerDialog = ft.FilePicker(on_result=pick_files2)
 filePicker = ft.TextButton(
     text='Choose your Backup File',
     style=ft.ButtonStyle(color='#00ff9d'),
     icon=ft.icons.UPLOAD_FILE_ROUNDED,
-    # icon_color='#00ffff',
     on_click=lambda _:filePickerDialog.pick_files(allowed_extensions=['backup']))
 
 sourceSection2 = ft.Container(
@@ -209,8 +209,12 @@ body2 = ft.Row(controls=[sourceSection2,destinationSection2],
 
 def run2(e):
 
+    submit2.disabled = True
+    submit2.bgcolor = '#10595959'
+    submitText2.color = '#949494'
+
     progContainer2.visible = True
-    progContainer2.update()
+    p.update()
 
     r = backup.Restore(backupFile, destinationDrives2.D2)
     r.analyze()
@@ -246,8 +250,7 @@ def main(page: ft.Page):
     page.title = 'Backup System'
     page.fonts = {0: 'fonts/INFECTED.ttf', 1:'fonts/Akira Expanded Demo.otf'}
     page.theme_mode = ft.ThemeMode.DARK
-    page.window.width, page.window.height = 555, 830
-    page.window.resizable = False
+    page.window.width, page.window.height = 700, 880
     page.scroll = ft.ScrollMode.ALWAYS
 
     global p
